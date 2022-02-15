@@ -14,7 +14,6 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 
 public class ImdbTest {
-    MainPage mainPage = new MainPage();
 
     @BeforeAll
     public static void setUpAll() {

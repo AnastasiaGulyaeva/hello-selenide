@@ -6,6 +6,7 @@ import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.open;
@@ -15,13 +16,17 @@ public class CartSuiteTest {
 
     @BeforeAll
     public static void setUpAll() {
-        Configuration.browserSize = "1280x800";
-        SelenideLogger.addListener("allure", new AllureSelenide());
+        SelenideLogger.addListener("allure", new AllureSelenide().screenshots(true).savePageSource(false));
+
+        DesiredCapabilities capabilites = new DesiredCapabilities();
+        capabilites.setCapability("enableVNC", true);
+        capabilites.setCapability("enableVNC", true);
+        Configuration.browserCapabilities = capabilites;
     }
 
     @BeforeEach
     public void setUp() {
-        open("http://localhost:3000/");
+        open("/");
     }
 
     @Test
@@ -29,7 +34,7 @@ public class CartSuiteTest {
         cartPage.addCola();
         cartPage.total().shouldBe(text("€1.25"));
         cartPage.addCola();
-        cartPage.total().shouldBe(text("€3.00"));
+        cartPage.total().shouldBe(text("€2.50"));
     }
 
     @Test

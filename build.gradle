@@ -1,9 +1,12 @@
 plugins {
     id 'java'
     id 'io.qameta.allure' version '2.9.3'
+    id 'jacoco'
+    id 'pmd'
+    id 'info.solidsoft.pitest' version '1.7.0'
 }
 
-group 'com.gft'
+group 'com.sinensia'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -13,6 +16,7 @@ repositories {
 ext {
     allureVersion = '2.16.1'
     junitVersion = '5.8.1'
+    cucumberVersion = '7.2.3'
 }
 
 sourceCompatibility = '11'
@@ -31,13 +35,36 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
-    testImplementation("io.cucumber:cucumber-java:7.2.3")
-    testImplementation("io.cucumber:cucumber-junit:7.2.3")
+    testImplementation("io.cucumber:cucumber-java:${cucumberVersion}")
+    testImplementation("io.cucumber:cucumber-junit:${cucumberVersion}")
     testImplementation("org.junit.vintage:junit-vintage-engine:${junitVersion}")
-    testImplementation("io.qameta.allure:allure-cucumber4-jvm:${allureVersion}")
+    testImplementation("io.qameta.allure:allure-cucumber4-jvm:2.15.0")
+
+}
+
+dependencies {
+    testImplementation('com.codeborne:selenide:5.25.0')
+    testImplementation("io.qameta.allure:allure-selenide:${allureVersion}")
+    testImplementation('org.hamcrest:hamcrest:2.2')
+    testImplementation('org.slf4j:slf4j-simple:1.7.30')
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+
+    testImplementation("io.cucumber:cucumber-java:${cucumberVersion}")
+    testImplementation("io.cucumber:cucumber-junit:${cucumberVersion}")
+    testImplementation("org.junit.vintage:junit-vintage-engine:${junitVersion}")
+    testImplementation("io.qameta.allure:allure-cucumber4-jvm:2.15.0")
+
 }
 
 test {
+    systemProperties["selenide.baseUrl"]="https://robobar.sinensia.pw"
+    systemProperties["selenide.remote"]="http://localhost:4444/wd/hub"
+    systemProperties["selenide.browser"]="edge"
+    systemProperties["selenide.browserVersion"]="97.0"
+    systemProperties["selenide.browserSize"]="600x800"
+    ignoreFailures = true
     useJUnitPlatform()
 }
 allure {
@@ -47,4 +74,49 @@ allure {
     useJUnit5 {
         version = "${allureVersion}"
     }
+}
+
+configurations {
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
+}
+
+task cucumberCli() {
+    dependsOn assemble, testClasses
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = [
+                    '--plugin', 'pretty',
+                    '--plugin', 'html:target/cucumber-report.html',
+                    '--glue', 'com.sinensia',
+                    'src/test/resources',
+            ]
+        }
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+    }
+}
+
+pmd {
+    consoleOutput = true
+    ignoreFailures = true
+}
+
+pitest{
+    junit5PluginVersion='0.12'
+    outputFormats = ['XML', 'HTML']
+    timestampedReports = false
 }
