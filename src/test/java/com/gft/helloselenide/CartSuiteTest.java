@@ -12,7 +12,7 @@ import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.open;
 
 public class CartSuiteTest {
-    CartPage cartPage =  new CartPage();
+    CartPage cartPage = new CartPage();
 
     @BeforeAll
     public static void setUpAll() {
@@ -20,13 +20,18 @@ public class CartSuiteTest {
 
         DesiredCapabilities capabilites = new DesiredCapabilities();
         capabilites.setCapability("enableVNC", true);
-        capabilites.setCapability("enableVNC", true);
+        capabilites.setCapability("enableVideo", true);
         Configuration.browserCapabilities = capabilites;
     }
 
     @BeforeEach
     public void setUp() {
         open("/");
+    }
+
+    @Test
+    public void startTest() {
+        cartPage.getCheckoutButton().shouldBe(disabled);
     }
 
     @Test

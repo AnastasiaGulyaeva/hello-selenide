@@ -1,4 +1,5 @@
 Feature: Robobar cart
+
   Scenario: user add one cola
     Given user opens robobar website
     When user adds a cola
@@ -8,32 +9,16 @@ Feature: Robobar cart
     Given user opens robobar website
     When user adds a cola
     And user adds a cola
-    Then total should be €2.50
+    Then total should be "€2.50"
 
-  Scenario: underage user adds on beer
+  Scenario: user adds one beer
     Given user opens robobar website
     When user adds a beer
-    And user goes to checkout
-    And user puts their age as "17"
-    And user confirms the order
-    Then alert should be visible
-
-  Scenario: overage user adds on beer
-    Given user opens robobar website
-    When user adds a beer
-    And user goes to checkout
-    And user puts their age as "19"
-    And user confirms the order
-    Then alert should be "Coming right up! ~bzzzt~"
-
-  Scenario: user buys several drinks
-    Given user opens robobar website
-    Then user adds a cola and a beer
-    Then total should be €3.25
+    Then total should be €2.00
 
   Scenario Outline: user buys several colas
     Given user opens robobar website
-    Then user adds <n> colas
+    When user adds <n> cola
     Then total should be €<total>
     Examples:
       | n | total |
@@ -62,7 +47,7 @@ Feature: Robobar cart
 
   Scenario Outline: user buy several drinks
     Given user opens robobar website
-    When user adds <cola> colas
+    When user adds <cola> cola
     And user adds <beer> beers
     Then total should be €<total>
     Examples:
@@ -71,4 +56,39 @@ Feature: Robobar cart
       | 0    | 1    | 2.00  |
       | 1    | 1    | 3.25  |
 
+  Scenario Outline: user buy several drinks
+    Given user opens robobar website
+    When user adds <cola> cola <beer> beer <wine> wine
+    Then total should be €<total>
+    Examples:
+      | cola | beer | wine | total |
+      | 1    | 0    | 0    | 1.25  |
 
+  Scenario Outline: user buy several drinks
+    Given user opens robobar website
+    When user adds <cola> cola <beer> beer <wine> wine
+    Then total should be €<total>
+    And user checks out
+    And user is <age> years old
+    But checkout result is "<expected>"
+    Examples:
+      | cola | beer | wine | total | age | expected |
+      | 1    | 0    | 0    | 1.25  | 17  | pass     |
+      | 1    | 1    | 0    | 3.25  | 17  | fail     |
+
+  Scenario: user buys several drinks
+    Given user opens robobar website
+    When user adds a cola and a beer
+    Then total should be €3.25
+
+  Scenario: any user buys a cola
+    Given user opens robobar website
+    When user adds a cola
+    And user checks out
+    Then robobar confirms order
+
+  Scenario: any user buys a cola
+    Given user opens robobar website
+    * user adds a cola
+    * user checks out
+    * robobar confirms order

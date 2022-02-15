@@ -2,10 +2,12 @@ package com.gft.helloselenide.cucumber;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.logevents.SelenideLogger;
+
 import com.gft.helloselenide.CartPage;
 import com.gft.helloselenide.CheckoutPage;
 import com.gft.helloselenide.OrderPage;
-import io.cucumber.java.en.And;
+import io.cucumber.java.PendingException;
+import io.cucumber.java.en.But;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -16,11 +18,13 @@ import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.open;
 
 public class RobobarStepDefinitions {
+
     private final CartPage cartPage = new CartPage();
     private CheckoutPage checkoutPage;
     private OrderPage orderPage;
 
     @Given("user opens robobar website")
+    @Given("l'usuari entra al bar")
     public void openRobobar() {
         SelenideLogger.addListener("allure", new AllureSelenide()
                 .screenshots(true)
@@ -29,7 +33,7 @@ public class RobobarStepDefinitions {
 
         DesiredCapabilities capabilites = new DesiredCapabilities();
         capabilites.setCapability("enableVNC", true);
-        capabilites.setCapability("enableVNC", true);
+        // capabilites.setCapability("enableVideo", true);
         Configuration.browserCapabilities = capabilites;
 
         open("/");
@@ -37,8 +41,20 @@ public class RobobarStepDefinitions {
     }
 
     @When("user adds a cola")
-    public void userAddsACola() {
+    @When("l'usuari afegeix una cocacola")
+    public void userAddsaCola() {
         cartPage.addCola();
+    }
+
+    @Then("total should be {string}")
+    public void totalShoudBe(String total) {
+        cartPage.total().shouldBe(exactText(total));
+    }
+
+    @Then("total should be €{double}")
+    @Then("el total ha de ser {double}€")
+    public void totalShouldBeDouble(Double total) {
+        cartPage.total().shouldBe(exactText(String.format("€%.2f", total)));
     }
 
     @When("user adds a beer")
@@ -46,65 +62,57 @@ public class RobobarStepDefinitions {
         cartPage.addBeer();
     }
 
-    /*
-    @Then("total should be €{double}")
-    public void totalShouldBe€(Double total) {
-        cartPage.total().shouldBe(text(total.toString()));
-    }
-    */
-    @Then("total should be €{double}")
-    public void totalShouldBe(Double total) {
-        cartPage.total().shouldBe(exactText(String.format("€%.2f", total)));
+    @When("user adds a wine")
+    public void userAddsAWine() {
+        cartPage.addWine();
     }
 
-    @When("user goes to checkout")
-    public void userGoesToCheckout() {
+    @When("user checks out")
+    public void userChecksOut() {
         checkoutPage = cartPage.checkout();
     }
 
-    @When("user puts their age as {string}")
-    public void userPutsTheirAgeAs(String age) {
-        checkoutPage.setAge(age);
+    @When("user is {int} years old")
+    public void userIsYearsOld(int age) {
+        checkoutPage.setAge(String.valueOf(age));
     }
 
-    @And("user confirms the order")
-    public void userConfirmsTheOrder() {
-        orderPage = checkoutPage.order();
+    @Then("robobar does not allow checkout")
+    public void robobarDoesNotAllowCheckout() {
+        orderPage = checkoutPage.confirm();
+        orderPage.alert().shouldNotBe(hidden);
     }
 
-    @Then("alert should be visible")
-    public void alertShouldBeVisible() {
-        orderPage.getAlertAge().shouldBe(visible);
+    @Then("robobar confirms order")
+    public void robobarConfirmsOrder() {
+        orderPage = checkoutPage.confirm();
+        orderPage.alert().shouldBe(hidden);
+        orderPage.confirmationMessage().shouldBe(matchText("Coming right up"));
     }
 
-    @Then("alert should be {string}")
-    public void alertShouldBe(String message) {
-        orderPage.getConfirmationMessage().shouldBe(exactText(message));
-    }
-
-    @Then("user adds a cola and a beer")
+    @When("user adds a cola and a beer")
     public void userAddsAColaAndABeer() {
         cartPage.addCola();
         cartPage.addBeer();
     }
 
-    @Then("user adds {int} colas")
+    @When("user adds {int} cola")
     public void userAddsCola(int n) {
-        for(int i=0; i<n; i++) {
+        for(int i=0; i<n; ++i) {
             cartPage.addCola();
         }
     }
 
     @When("user adds {int} beers")
     public void userAddsNBeers(int n) {
-        for(int i=0; i<n; i++) {
+        for(int i=0; i<n; ++i) {
             cartPage.addBeer();
         }
     }
 
     @When("user adds {int} wines")
     public void userAddsNWines(int n) {
-        for(int i=0; i<n; i++) {
+        for(int i=0; i<n; ++i) {
             cartPage.addWine();
         }
     }
@@ -114,5 +122,17 @@ public class RobobarStepDefinitions {
         userAddsCola(cola);
         userAddsNBeers(beer);
         userAddsNWines(wine);
+    }
+
+    @Given("user is ready to check out with alcohol")
+    public void userIsReadyToCheckOutWithAlcohol() {
+        openRobobar();
+        userAddsABeer();
+        userChecksOut();
+    }
+
+    @But("checkout result is {string}")
+    public void checkoutResultIsExpected(String expected) {
+        throw new PendingException();
     }
 }

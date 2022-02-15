@@ -10,17 +10,15 @@ import static com.codeborne.selenide.Selenide.*;
 // http://localhost:3000/#!/success
 public class OrderPage {
 
-    private SelenideElement confirmationMessage = $("p");
+    private SelenideElement alertDiv = $(".alert-danger");
 
-    private SelenideElement cancelButton = $(".btn-default");
+    private SelenideElement confirmationMessage = $x("//p");
 
-    private SelenideElement alertAge = $(".alert-danger");
-
-    public SelenideElement getConfirmationMessage() {
-        return confirmationMessage;
+    public SelenideElement alert() {
+        return alertDiv;
     }
 
-    public SelenideElement getAlertAge() {
-        return alertAge;
+    public SelenideElement confirmationMessage() {
+        return confirmationMessage;
     }
 }

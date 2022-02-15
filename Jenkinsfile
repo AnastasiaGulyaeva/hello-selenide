@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     stages {
         stage('Clean') {
             steps {
@@ -8,17 +7,18 @@ pipeline {
             }
         }
         stage('Test') {
+            // parallelize browser tests
             parallel {
-                stage ('test:chrome') {
+                stage('test: chrome') {
                     steps {
-                        sh '.gradlew test'
+                        sh './gradlew test'
                     }
                 }
-                 stage ('test: firefox') {
-                     steps {
-                         sh '.gradlew testFirefox'
-                     }
-                 }
+                stage('test: firefox') {
+                    steps {
+                        sh './gradlew testFirefox'
+                    }
+                }
             }
             post {
                 always {
