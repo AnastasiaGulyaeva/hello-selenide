@@ -17,7 +17,7 @@ pipeline {
         stage('Build') {
             steps {
                 // Get some code from a GitHub repository
-                git branch: 'main', url: 'https://github.com/AnastasiaGulyaeva/gft_hello_spring.git'
+                git branch: 'main', url: 'https://github.com/AnastasiaGulyaeva/hello-selenide.git'
                 // Run Gradle Wrapper
                 sh "./gradlew assemble"
             }
