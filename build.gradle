@@ -2,11 +2,9 @@ plugins {
     id 'java'
     id 'io.qameta.allure' version '2.9.3'
     id 'jacoco'
-    id 'pmd'
-    id 'info.solidsoft.pitest' version '1.7.0'
 }
 
-group 'com.sinensia'
+group 'com.gft'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -97,7 +95,6 @@ task cucumberCli() {
         }
     }
 }
-
 
 jacocoTestReport {
     dependsOn test

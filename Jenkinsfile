@@ -14,21 +14,5 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
-            steps {
-                // Get some code from a GitHub repository
-                git branch: 'main', url: 'https://github.com/AnastasiaGulyaeva/hello-selenide.git'
-                // Run Gradle Wrapper
-                sh "./gradlew assemble"
-            }
-            post {
-                // If Gradle was able to run the tests, even if some of the test
-                // failed, record the test results and archive the jar file.
-                success {
-                    archiveArtifacts 'build/libs/*.jar'
-                }
-            }
-        }
-
     }
 }
