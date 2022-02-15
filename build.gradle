@@ -98,25 +98,10 @@ task cucumberCli() {
     }
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-    finalizedBy jacocoTestReport
-}
 
 jacocoTestReport {
     dependsOn test
     reports {
         xml.required = true
     }
-}
-
-pmd {
-    consoleOutput = true
-    ignoreFailures = true
-}
-
-pitest{
-    junit5PluginVersion='0.12'
-    outputFormats = ['XML', 'HTML']
-    timestampedReports = false
 }
