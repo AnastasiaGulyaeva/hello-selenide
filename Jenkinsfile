@@ -1,8 +1,14 @@
 pipeline {
     agent any
+    options {
+        ansiColor('xterm')
+     }
+
     stages {
         stage('Clean') {
-            sh './gradlew clean'
+            steps {
+                sh './gradlew clean'
+            }
         }
         stage('Test') {
             // parallelize browser tests
@@ -25,14 +31,12 @@ pipeline {
             }
         }
         stage('Security') {
-                    steps {
-                        sh 'trivy fs --format json --output trivy-results.json .'
-                    }
-                    post {
-                        always {
-                            recordIssues(tools: [trivy(pattern: 'trivy-results.json')])
-                        }
-                    }
+            steps {
+                sh 'trivy fs --format json --output trivy-results.json .'
+            }
+            post {
+                always {
+                    recordIssues(tools: [trivy(pattern: 'trivy-results.json')])
                 }
             }
         }
